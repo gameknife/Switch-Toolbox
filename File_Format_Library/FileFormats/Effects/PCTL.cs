@@ -548,7 +548,9 @@ namespace FirstPlugin
                     case "SHDB":
                         reader.Seek(BinaryDataOffset + section.Position, SeekOrigin.Begin);
                         section.Text = "GTX Shader";
-                        reader.ReadBytes((int)section.SectionSize);
+                        BinaryData = new GTXFile();
+                        ((GTXFile)BinaryData).Load( new MemoryStream(reader.ReadBytes((int)section.SectionSize)) );
+                        Nodes.Add(((GTXFile)BinaryData));
                         break;
                     case "EMTR":
                         reader.Seek(BinaryDataOffset + 16 + section.Position, SeekOrigin.Begin);
