@@ -48,7 +48,8 @@ namespace FlatTabControl
 			this.SetStyle(ControlStyles.DoubleBuffer, true);
 			this.SetStyle(ControlStyles.ResizeRedraw, true);
 			this.SetStyle(ControlStyles.SupportsTransparentBackColor, true);
-
+			
+			Font = new System.Drawing.Font("Microsoft YaHei UI", 8F, FontStyle.Bold); 
 
             bUpDown = false;
 

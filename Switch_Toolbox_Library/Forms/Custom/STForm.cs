@@ -84,6 +84,8 @@ namespace Toolbox.Library.Forms
             TitleBar.BackColor = BorderColor;
 
             StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
+            
+            Font = new System.Drawing.Font("Microsoft YaHei UI", 8F); 
         }
 
         protected override void OnCreateControl()
@@ -142,7 +144,7 @@ namespace Toolbox.Library.Forms
             // LblTitle
             // 
             this.LblTitle.AutoSize = true;
-            this.LblTitle.Font = new System.Drawing.Font("Segoe UI Semibold", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.LblTitle.Font = new System.Drawing.Font("Microsoft YaHei UI", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.LblTitle.Location = new System.Drawing.Point(20, 3);
             this.LblTitle.Name = "LblTitle";
             this.LblTitle.Size = new System.Drawing.Size(33, 17);
