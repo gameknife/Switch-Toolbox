@@ -406,21 +406,25 @@ namespace FirstPlugin
         public STForm ActiveFormEditor; //For active form windows as editors
 
         private bool DrawablesLoaded = false;
-        public void LoadEditors(object SelectedSection)
+        public void LoadEditors(object SelectedSection, BfresEditor ExternalBfresEditor = null)
         {
             Console.WriteLine($"SelectedSection {SelectedSection}");
 
-            BfresEditor bfresEditor = (BfresEditor)LibraryGUI.GetActiveContent(typeof(BfresEditor));
             bool HasModels = false;
             bool hasShapes = HasShapes();
-
-            if (bfresEditor == null)
+            
+            BfresEditor bfresEditor = ExternalBfresEditor;
+            if (ExternalBfresEditor == null)
             {
-                HasModels = BFRESRender.models.Count > 0;
+                bfresEditor = (BfresEditor)LibraryGUI.GetActiveContent(typeof(BfresEditor));
+                if (bfresEditor == null)
+                {
+                    HasModels = BFRESRender.models.Count > 0;
 
-                bfresEditor = new BfresEditor(HasModels);
-                bfresEditor.Dock = DockStyle.Fill;
-                LibraryGUI.LoadEditor(bfresEditor);
+                    bfresEditor = new BfresEditor(HasModels);
+                    bfresEditor.Dock = DockStyle.Fill;
+                    LibraryGUI.LoadEditor(bfresEditor);
+                }
             }
 
             bool ViewportToggled = bfresEditor.DisplayViewport;

@@ -50,7 +50,7 @@ namespace Toolbox.Library.Forms
             if (Runtime.ObjectEditor.EditorDiplayIndex < stComboBox1.Items.Count)
                 stComboBox1.SelectedIndex = Runtime.ObjectEditor.EditorDiplayIndex;
             else
-                stComboBox1.SelectedIndex = 0;
+                stComboBox1.SelectedIndex = 3;
         }
 
         public void SetEditor(int Index) { stComboBox1.SelectedIndex = Index; }

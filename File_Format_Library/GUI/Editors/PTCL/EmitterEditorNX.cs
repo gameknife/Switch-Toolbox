@@ -160,8 +160,8 @@ namespace FirstPlugin
 
             Console.WriteLine("DrawableTex " + Emitter.DrawableTex.Count);
 
-            if (Emitter.DrawableTex.Count <= 0)
-                return;
+            // if (Emitter.DrawableTex.Count <= 0)
+            //     return;
 
             emitterTexturePanel1.LoadTextures(Emitter);
         }

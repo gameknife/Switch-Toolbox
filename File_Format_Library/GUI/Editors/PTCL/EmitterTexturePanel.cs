@@ -24,7 +24,16 @@ namespace FirstPlugin.Forms
         public void LoadTextures(PTCL.Emitter emitter)
         {
             ActiveEmitter = emitter;
+         
+            // foreach samplers
+            string NameInfo = "";
+            foreach (var Sampler in ActiveEmitter.Samplers)
+            {
+                NameInfo += Sampler.TextureID.ToString() + " | ";
+            }
 
+            stLabel6.Text = NameInfo;
+            
             pictureBoxCustom1.Visible = false;
             pictureBoxCustom2.Visible = false;
             pictureBoxCustom3.Visible = false;

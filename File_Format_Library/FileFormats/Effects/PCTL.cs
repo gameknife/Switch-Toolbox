@@ -56,9 +56,17 @@ namespace FirstPlugin
 
         bool IsWiiU = false;
         bool Is3DS = false;
+        
+        static BNTX bntx = null;
+        static List<TextureDescriptor> texDescp = new List<TextureDescriptor>();
+        static List<TEXR> botwTex = new List<TEXR>(); //Used for BOTW
+
+        public static List<string> EMTR_Names = new List<string>();
 
         public void Load(Stream stream)
         {
+            EMTR_Names.Clear();
+            
             data = stream.ToArray();
 
             Text = FileName;
@@ -203,11 +211,21 @@ namespace FirstPlugin
             }
             private void MapTextureIDs(PTCL ptcl)
             {
-                List<TextureDescriptor> texDescp = new List<TextureDescriptor>();
                 List<Emitter> emitters = new List<Emitter>();
-                BNTX bntx = ptcl.header.BinaryTextureFile;
-                List<TEXR> botwTex = new List<TEXR>(); //Used for BOTW
 
+                if (bntx == null)
+                {
+                    bntx = ptcl.header.BinaryTextureFile;
+                    // texDescp.Clear();
+                    // botwTex.Clear();
+                }
+
+                bool FirstTime = false;
+                if (botwTex.Count == 0)
+                {
+                    FirstTime = true; 
+                }
+                
                 foreach (var node in TreeViewExtensions.Collect(ptcl.Nodes))
                 {
                     if (node is TextureDescriptor)
@@ -217,12 +235,16 @@ namespace FirstPlugin
                     if (node is SectionBase && ((SectionBase)node).BinaryData is TEXR)
                         botwTex.Add((TEXR)((SectionBase)node).BinaryData);
                 }
-
+                
                 int index = 0;
                 if (botwTex.Count > 0)
                 {
                     TextureFolder textureFolder = new TextureFolder("Textures");
-                    ptcl.Nodes.Add(textureFolder);
+                    if (FirstTime)
+                    {
+                        ptcl.Nodes.Add(textureFolder);
+                    }
+                   
 
                     List<TEXR> TextureList = new List<TEXR>();
 
@@ -233,8 +255,12 @@ namespace FirstPlugin
                             bool HasImage = TextureList.Any(item => item.data == tex.data);
                             if (!HasImage)
                             {
-                                tex.Text = "Texture " + index++;
-                                textureFolder.Nodes.Add(tex);
+                                if (FirstTime)
+                                {
+                                    tex.Text = "" + index++ + ". Texture #" + tex.TextureID.ToString(); //index++;
+                                    if (!textureFolder.TextureList.Contains(tex))
+                                        textureFolder.Nodes.Add(tex);
+                                }
                             }
                             TextureList.Add(tex);
 
@@ -559,6 +585,7 @@ namespace FirstPlugin
                         reader.Seek(BinaryDataOffset + 16 + 64 + section.Position, SeekOrigin.Begin);
                         BinaryData = new Emitter();
                         ((Emitter)BinaryData).Read(reader, ptclHeader);
+                        EMTR_Names.Add(Text);
                         break;
                     case "ESTA":
                         section.Text = "Emitter Sets";

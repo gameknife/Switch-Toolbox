@@ -11,6 +11,7 @@ using Toolbox.Library.Forms;
 using Bfres.Structs;
 using System.IO;
 using System.Linq;
+using Syroot.BinaryData;
 
 namespace FirstPlugin
 {
@@ -32,6 +33,89 @@ namespace FirstPlugin
         ComputeShaderHeader = 0x14,
         ComputeShader = 0x15,
         UserBlock = 0x16,
+    }
+
+    public struct RelocationInfo
+    {
+        public uint TableSize;
+        public uint StartPos;
+        public uint StringTableSize;
+        public uint StringTablePos;
+        public uint RelocationCount;
+        public uint RelocationTablePos;
+
+        public void Read( FileReader reader, long Offset )
+        {
+            reader.SetByteOrder(true);
+            reader.SeekBegin(Offset);
+            string magic = reader.ReadSignature(4);
+            reader.ReadUInt32();
+            reader.ReadUInt32();
+            TableSize = reader.ReadUInt32();
+            StartPos = reader.ReadUInt32();
+            StringTableSize = reader.ReadUInt32();
+            StringTablePos = reader.ReadUInt32() - StartPos;
+            reader.ReadUInt32();
+            RelocationCount = reader.ReadUInt32();
+            RelocationTablePos = reader.ReadUInt32() - StartPos;
+        }
+    }
+
+    public class UniformInfo
+    {
+        public List< List<string> > UniformByGroup = new List< List<string> >();
+        public List<uint> Groups = new List<uint>();
+        
+        public void Read( FileReader reader, RelocationInfo Info )
+        {
+            reader.SetByteOrder(true);
+
+            for (int i = 0; i < Info.RelocationCount; i++)
+            {
+                reader.SeekBegin(Info.RelocationTablePos + i * 4);
+                uint RelocationAddress = reader.ReadUInt32();
+                if (RelocationAddress == 0)
+                {
+                    continue;
+                }
+                uint InnerPos = RelocationAddress - Info.StartPos;
+                reader.SeekBegin(InnerPos);
+                uint RelocAddress = reader.ReadUInt32();
+
+                if ( (RelocAddress & 0xFFF00000) == 0xD0600000)
+                {
+                    // Data skip
+                    uint data = reader.ReadUInt32();
+                    Console.WriteLine($"Found 0xD06, {data}");
+                    
+                    // seems like uniform groups, data like group type, 7 contain all textures
+                    uint GroupAddress = RelocAddress - 0xD0600000;
+                    reader.SeekBegin(GroupAddress);
+                    Groups.Add(reader.ReadUInt32());
+                    
+                    UniformByGroup.Add( new List<string>() );
+                }
+                else if ( (RelocAddress & 0xFFF00000) == 0xCA700000)
+                {
+                    for (int j = Groups.Count - 1; j >= 0; j--)
+                    {
+                        if (Groups[j] <= RelocAddress)
+                        {
+                            // It is string, add
+                            uint StringAddress = RelocAddress - 0xCA700000;
+                            reader.SeekBegin(StringAddress);
+                            string Uniform = reader.ReadString(BinaryStringFormat.ZeroTerminated, Encoding.ASCII);
+                            UniformByGroup[j].Add(Uniform);
+                            Console.WriteLine($"Found 0xCA7: {Uniform}");
+                            
+                            break;
+                        }
+                    }
+ 
+                }
+            }
+            Console.WriteLine("-----------");
+        }
     }
 
     public class GTXFile : TreeNodeFile, IFileFormat, IContextMenuNode, ITextureContainer
@@ -108,7 +192,7 @@ namespace FirstPlugin
         {
             CanSave = true;
             Text = FileName;
-
+            
             ReadGx2(new FileReader(stream));
 
             string name = System.IO.Path.GetFileNameWithoutExtension(Text);
@@ -285,7 +369,7 @@ namespace FirstPlugin
         private void ReadGx2(FileReader reader)
         {
             reader.ByteOrder = Syroot.BinaryData.ByteOrder.BigEndian;
-
+            
             header = new GTXHeader();
             header.Read(reader);
 
@@ -328,9 +412,14 @@ namespace FirstPlugin
             uint ImageInfo = 0;
             uint images = 0;
 
+            int VSHeaderCount = 0;
+            int VSProgramCount = 0;
+            int PSHeaderCount = 0;
+            int PSProgramCount = 0;
+            
             while (reader.Position < reader.BaseStream.Length)
             {
-                Console.WriteLine("BLOCK POS " + reader.Position + " " + reader.BaseStream.Length);
+                //Console.WriteLine("BLOCK POS " + reader.Position + " " + reader.BaseStream.Length);
                 GTXDataBlock block = new GTXDataBlock();
                 block.Read(reader);
                 blocks.Add(block);
@@ -373,19 +462,36 @@ namespace FirstPlugin
                     mipMaps.Add(block.data);
                 }
                 else if ((uint)block.BlockType == vertexShaderHeader)
-                    Nodes.Add(new BlockDisplay(block.data) { Text = "Vertex Shader Header" });
+                {
+                    Nodes.Add(new BlockDisplay(block.data) { Text = PTCL.EMTR_Names[VSHeaderCount] + " - VS Header" });
+                    VSHeaderCount++;
+                }
                 else if ((uint)block.BlockType == vertexShaderProgram)
-                    Nodes.Add(new BlockDisplay(block.data) { Text = "Vertex Shader Program" });
+                {
+                    Nodes.Add(new BlockDisplay(block.data) { Text = PTCL.EMTR_Names[VSProgramCount] + " - VS Program" });
+                    VSProgramCount++;
+                }
                 else if ((uint)block.BlockType == pixelShaderHeader)
-                    Nodes.Add(new BlockDisplay(block.data) { Text = "Pixel Shader Header" });
+                {
+                    Nodes.Add(new BlockDisplay(block.data) { Text = PTCL.EMTR_Names[PSHeaderCount] + " - PS Header" });
+                    PSHeaderCount++;
+                }
+                    
                 else if ((uint)block.BlockType == pixelShaderProgram)
-                    Nodes.Add(new BlockDisplay(block.data) { Text = "Pixel Shader Program" });
+                {
+                    Nodes.Add(new BlockDisplay(block.data) { Text = PTCL.EMTR_Names[PSProgramCount] + " - PS Program" });
+                    PSProgramCount++;
+                }
                 else if ((uint)block.BlockType == geometryShaderHeader)
                     Nodes.Add(new BlockDisplay(block.data) { Text = "Geometry Shader Header" });
                 else if ((uint)block.BlockType == geometryShaderProgram)
                     Nodes.Add(new BlockDisplay(block.data) { Text = "Geometry Shader Program" });
                 else if (!BlockIsEmpty)
                     Nodes.Add(new BlockDisplay(block.data) { Text = $"Block Type {block.BlockType.ToString("X")}" });
+                else
+                {
+                    //Console.WriteLine("Block align");
+                }
             }
             if (textures.Count != data.Count)
                 throw new Exception($"Bad size! {textures.Count} {data.Count}");
@@ -421,22 +527,79 @@ namespace FirstPlugin
         {
             public byte[] BlockData;
 
+            public string Uniforms;
+
+            private UInt32 swapOctetsUInt32(UInt32 toSwap)
+            {
+                UInt32 tmp = 0;
+                tmp = toSwap >> 24;
+                tmp = tmp | ((toSwap & 0xff0000) >> 8);
+                tmp = tmp | ((toSwap & 0xff00) << 8);
+                tmp = tmp | ((toSwap & 0xff) << 24);
+                return tmp;
+            }
+            
             public BlockDisplay(byte[] data)
             {
                 BlockData = data;
+                FileReader reader = new FileReader(new MemoryStream(BlockData));
+                
+                RelocationInfo Info = new RelocationInfo();
+                UniformInfo UniformInfo = new UniformInfo();
+                
+                // Search the first }BLK, it is the start of Relocation Info
+                for (int i = 1; i < BlockData.Length - 3; ++i)
+                {
+                    if (BlockData[i] == '}' && BlockData[i + 1] == 'B' && BlockData[i + 2] == 'L' &&
+                        BlockData[i + 3] == 'K')
+                    {
+                        
+                        Info.Read(reader, i);
+                        break;
+                    }
+                }
+                
+                UniformInfo.Read(reader, Info);
+
+                foreach (var Group in UniformInfo.UniformByGroup)
+                {
+                    Uniforms += "Group: {\n";
+
+                    foreach (var Uniform in Group)
+                    {
+                        Uniforms += "    " + Uniform + "\n";
+                    }
+
+                    Uniforms += "}\n";
+                }
             }
 
             public override void OnClick(TreeView treeview)
             {
-                HexEditor editor = (HexEditor)LibraryGUI.GetActiveContent(typeof(HexEditor));
-                if (editor == null)
+                if ( Uniforms == null)
                 {
-                    editor = new HexEditor();
-                    LibraryGUI.LoadEditor(editor);
+                    HexEditor editor = (HexEditor)LibraryGUI.GetActiveContent(typeof(HexEditor));
+                    if (editor == null)
+                    {
+                        editor = new HexEditor();
+                        LibraryGUI.LoadEditor(editor);
+                    }
+                    editor.Text = Text;
+                    editor.Dock = DockStyle.Fill;
+                    editor.LoadData(BlockData);
                 }
-                editor.Text = Text;
-                editor.Dock = DockStyle.Fill;
-                editor.LoadData(BlockData);
+                else
+                {
+                    TextEditor editor = (TextEditor)LibraryGUI.GetActiveContent(typeof(TextEditor));
+                    if (editor == null)
+                    {
+                        editor = new TextEditor();
+                        LibraryGUI.LoadEditor(editor);
+                    }
+                
+                    editor.Dock = DockStyle.Fill;
+                    editor.FillEditor(Uniforms);
+                }
             }
         }
 

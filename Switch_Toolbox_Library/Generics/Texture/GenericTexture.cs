@@ -546,6 +546,10 @@ namespace Toolbox.Library
         /// <returns></returns>
         public Bitmap GetBitmap(int ArrayLevel = 0, int MipLevel = 0, int DepthLevel = 0)
         {
+            if (FullPath.Contains(".Tex2"))
+            {
+                MipLevel = MipLevel + 1;
+            }
             uint width = Math.Max(1, Width >> MipLevel);
             uint height = Math.Max(1, Height >> MipLevel);
             byte[] data = GetImageData(ArrayLevel, MipLevel, DepthLevel);

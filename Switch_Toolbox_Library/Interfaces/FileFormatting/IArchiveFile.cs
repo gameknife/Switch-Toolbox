@@ -249,7 +249,12 @@ namespace Toolbox.Library
         {
             get
             {
-                if (_fileStream != null)
+                if (_fileStream != null && !_fileStream.CanRead)
+                {
+                    return null;
+                }
+                
+                if (_fileStream != null && _fileStream.CanSeek)
                     _fileStream.Position = 0;
 
                 return _fileStream;

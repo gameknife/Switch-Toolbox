@@ -28,8 +28,8 @@ namespace UKing.Actors
             get { return $"/Pack/Bootup_{MessageRegion}{MessageLanguage}.pack"; }
         }
 
-        public Language MessageLanguage = Language.en;
-        public Region MessageRegion = Region.US;
+        public Language MessageLanguage = Language.ja;
+        public Region MessageRegion = Region.JP;
 
         public enum Region
         {
@@ -365,7 +365,11 @@ namespace UKing.Actors
                     Models.FilePathModel = modelPath;
                 if (File.Exists(animationPath))
                     Models.FilePathAnimation = animationPath;
-
+                
+                //Load Actor Link Pack
+                string actorlnkPath = $"{Runtime.BotwGamePath}/Actor/Pack/{Info.Name}.sbactorpack";
+                if (File.Exists(actorlnkPath))
+                    Parameters.FilePathActorLink = actorlnkPath;
                 //Load any cached paths
 
             }
@@ -391,7 +395,7 @@ namespace UKing.Actors
 
         public class ActorParameters
         {
-
+            public string FilePathActorLink { get; set; }
         }
 
         public class ActorTextures

@@ -3,10 +3,14 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
 using System.Data;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using Bfres.Structs;
+using FirstPlugin;
+using Toolbox.Library;
 using Toolbox.Library.Forms;
 using UKing.Actors;
 
@@ -24,6 +28,38 @@ namespace UKing.Actors.Forms
         public void LoadActor(BotwActorLoader.ActorEntry entry)
         {
             stPropertyGrid1.LoadProperty(entry.Info);
+
+            if (entry.Models.FilePathModel != null && entry.Textures.FilePathTex1 != null)
+            {
+                BFRES bfres = (BFRES)Toolbox.Library.IO.STFileLoader.OpenFileFormat(entry.Models.FilePathModel);
+                BFRES btex = (BFRES)Toolbox.Library.IO.STFileLoader.OpenFileFormat(entry.Textures.FilePathTex1);
+                if (BfresEditor == null)
+                {
+                    BfresEditor = new FirstPlugin.Forms.BfresEditor(true);
+                    BfresEditor.Dock = DockStyle.Fill;
+                    tabPage3.Controls.Add(BfresEditor);
+                }
+
+                PluginRuntime.UseSimpleBfresEditor = true;
+                bfres.LoadEditors(null, BfresEditor);
+            }
+
+
+            if (entry.Parameters.FilePathActorLink != null && entry.Nodes.Count == 0)
+            {
+                string imageKey = "Byaml";
+                SARC link = (SARC)Toolbox.Library.IO.STFileLoader.OpenFileFormat(entry.Parameters
+                    .FilePathActorLink);
+                foreach (var File in link.Files)
+                {
+                    entry.Nodes.Add(new QuickAccessFile(File.FileName)
+                    {
+                        Tag = File,
+                        ImageKey = imageKey,
+                        SelectedImageKey = imageKey
+                    });
+                }
+            }
         }
     }
 }

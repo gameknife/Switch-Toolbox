@@ -1,4 +1,6 @@
-﻿namespace UKing.Actors.Forms
+﻿using Toolbox.Library;
+
+namespace UKing.Actors.Forms
 {
     partial class BotwActorEditorControl
     {
@@ -120,5 +122,6 @@
         private System.Windows.Forms.TabPage tabPage2;
         private System.Windows.Forms.TabPage tabPage3;
         private System.Windows.Forms.TabPage tabPage4;
+        private FirstPlugin.Forms.BfresEditor BfresEditor;
     }
 }

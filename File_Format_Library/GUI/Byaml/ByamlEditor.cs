@@ -359,7 +359,14 @@ namespace FirstPlugin
                 {
                     if (k is IDictionary<string, dynamic>)
                     {
-                        TreeNode current = addto.Add($"<Dictionary> {dictionaryIndex++}");
+                        // GAMEKNIFE, if we got name, use name here
+                        string nodeName = $"<Dictionary> {dictionaryIndex++}";
+                        if (((IDictionary<string, dynamic>)k).ContainsKey("name"))
+                        {
+                            nodeName = ((IDictionary<string, dynamic>)k)["name"];
+                        }
+                        // GAMEKNIFE
+                        TreeNode current = addto.Add(nodeName);
                         current.Tag = ((IDictionary<string, dynamic>)k);
 
                         if (HasDynamicListChildren(current))
