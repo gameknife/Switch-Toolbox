@@ -29,21 +29,17 @@ namespace UKing.Actors.Forms
         {
             stPropertyGrid1.LoadProperty(entry.Info);
 
-            if (entry.Models.FilePathModel != null && entry.Textures.FilePathTex1 != null)
+            if (entry.Models.FilePathModel != null)
             {
                 BFRES bfres = (BFRES)Toolbox.Library.IO.STFileLoader.OpenFileFormat(entry.Models.FilePathModel);
-                BFRES btex = (BFRES)Toolbox.Library.IO.STFileLoader.OpenFileFormat(entry.Textures.FilePathTex1);
-                if (BfresEditor == null)
-                {
-                    BfresEditor = new FirstPlugin.Forms.BfresEditor(true);
-                    BfresEditor.Dock = DockStyle.Fill;
-                    tabPage3.Controls.Add(BfresEditor);
-                }
-
-                PluginRuntime.UseSimpleBfresEditor = true;
-                bfres.LoadEditors(null, BfresEditor);
+                if (entry.Textures.FilePathTex1 != null)
+                    Toolbox.Library.IO.STFileLoader.OpenFileFormat(entry.Textures.FilePathTex1);
+                
+                if (entry.Textures.FilePathTex2 != null)
+                    Toolbox.Library.IO.STFileLoader.OpenFileFormat(entry.Textures.FilePathTex2);
+                
+                bfres.LoadEditors(null);
             }
-
 
             if (entry.Parameters.FilePathActorLink != null && entry.Nodes.Count == 0)
             {

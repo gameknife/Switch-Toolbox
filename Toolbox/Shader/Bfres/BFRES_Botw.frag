@@ -340,8 +340,8 @@ vec3 albedo = vec3(1);
     outputColor += DiffusePass(albedo, N, L, R) * renderDiffuse;
     outputColor += SpecularPass(albedo, N, H, R, metallic, specularMapIntensity) * renderSpecular;
     outputColor += FresnelPass(N, V) * renderFresnel;
-    if (HasEmissionMap == 1 || enable_emission == 1) //Can be without texture map
-        outputColor.rgb += EmissionPass(EmissionMap, emission_intensity, vert, uking_texture2_texcoord, emission_color);
+    //if (HasEmissionMap == 1 || enable_emission == 1) //Can be without texture map
+    //    outputColor.rgb += EmissionPass(EmissionMap, emission_intensity, vert, uking_texture2_texcoord, emission_color);
 
     outputColor *= ao;
     outputColor *= (0.6 + shadow);

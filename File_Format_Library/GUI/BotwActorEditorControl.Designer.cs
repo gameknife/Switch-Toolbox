@@ -50,7 +50,7 @@ namespace UKing.Actors.Forms
             this.stTabControl1.Location = new System.Drawing.Point(0, 0);
             this.stTabControl1.myBackColor = System.Drawing.Color.Empty;
             this.stTabControl1.Name = "stTabControl1";
-            this.stTabControl1.SelectedIndex = 0;
+            this.stTabControl1.SelectedIndex = 2;
             this.stTabControl1.Size = new System.Drawing.Size(691, 528);
             this.stTabControl1.TabIndex = 0;
             // 
@@ -122,6 +122,5 @@ namespace UKing.Actors.Forms
         private System.Windows.Forms.TabPage tabPage2;
         private System.Windows.Forms.TabPage tabPage3;
         private System.Windows.Forms.TabPage tabPage4;
-        private FirstPlugin.Forms.BfresEditor BfresEditor;
     }
 }

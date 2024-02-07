@@ -172,7 +172,7 @@
             this.stPanel5.Dock = System.Windows.Forms.DockStyle.Fill;
             this.stPanel5.Location = new System.Drawing.Point(0, 0);
             this.stPanel5.Name = "stPanel5";
-            this.stPanel5.Size = new System.Drawing.Size(440, 515);
+            this.stPanel5.Size = new System.Drawing.Size(640, 640);
             this.stPanel5.TabIndex = 2;
             // 
             // BfresEditor

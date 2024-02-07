@@ -38,7 +38,7 @@ namespace Toolbox.Library.Rendering
             public static int Size = 4 * (3 + 3);
         }
 
-        public static float LineLength = 5;
+        public static float LineLength = 2;
 
         public DisplayVertex[] Vertices = new DisplayVertex[]
         {

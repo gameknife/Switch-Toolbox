@@ -44,7 +44,7 @@ namespace FirstPlugin.Forms
                 else
                 {
                     viewport = new Viewport(ObjectEditor.GetDrawableContainers());
-                    viewport.Dock = DockStyle.Fill;
+                    //viewport.Dock = DockStyle.Fill;
                     OnLoadedTab();
                 }
             }
@@ -88,7 +88,7 @@ namespace FirstPlugin.Forms
             if (viewport == null && Runtime.UseOpenGL)
             {
                 viewport = new Viewport(ObjectEditor.GetDrawableContainers());
-                viewport.Dock = DockStyle.Fill;
+                //viewport.Dock = DockStyle.Fill;
             }
 
             //If the option is enabled by settings, and it has models display the viewport

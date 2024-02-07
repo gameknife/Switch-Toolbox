@@ -285,6 +285,27 @@ namespace UKing.Actors
                     Categories[catgeory].Nodes.Add(entry);
                     entry.ReloadActorProperties();
                 }
+                else
+                {
+                    // string DevName = info.Value.Name;
+                    // string[] Predict = DevName.Split('_');
+                    // string catgeory = Predict.Length > 0 ? Predict[0] : "Default";
+                    //
+                    string catgeory = "0.Uncategorized";
+
+                    if (!Categories.ContainsKey(catgeory))
+                    {
+                        TreeNode node = new TreeNode(catgeory);
+                        editor.AddNode(node);
+                        Categories.Add(catgeory, node);
+                    }
+
+                    ActorEntry entry = new ActorEntry();
+                    entry.Info = info.Value;
+                    entry.Text = info.Value.Name;
+                    Categories[catgeory].Nodes.Add(entry);
+                    entry.ReloadActorProperties();
+                }
             }
 
             Categories.Clear();
@@ -295,7 +316,7 @@ namespace UKing.Actors
         {
             string dir = "";
 
-            var result = MessageBox.Show("Please set your game path for botw", "Actor Loader", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+            var result = MessageBox.Show("请选择荒野之息游戏根目录，该目录下有./Actor/ActorInfo.product.sbyml文件", "Actor Loader", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
             if (result == DialogResult.OK)
             {
                 FolderSelectDialog folderSelect = new FolderSelectDialog();

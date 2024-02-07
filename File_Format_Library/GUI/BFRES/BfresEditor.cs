@@ -56,7 +56,7 @@ namespace FirstPlugin.Forms
                 else
                 {
                     viewport = new Viewport(ObjectEditor.GetDrawableContainers());
-                    viewport.Dock = DockStyle.Fill;
+                    //viewport.Dock = DockStyle.Fill;
                     OnLoadedTab();
                 }
             }
@@ -103,16 +103,22 @@ namespace FirstPlugin.Forms
             {
                 if (viewport == null || (viewport != null && viewport.IsDisposed))
                 {
-                    viewport = new Viewport(ObjectEditor.GetDrawableContainers());
-                    viewport.Dock = DockStyle.Fill;
-                    viewport.DisplayAll = DisplayAll;
+                    
                 }
             }
 
             //If the option is enabled by settings, and it has models display the viewport
             if (Runtime.UseOpenGL && Runtime.DisplayViewport && HasModels)
             {
+                if (viewport != null)
+                {
+                    viewport.Dispose();
+                }
+                viewport = new Viewport(ObjectEditor.GetDrawableContainers());
+                viewport.Dock = DockStyle.Fill;
+                viewport.DisplayAll = DisplayAll;
                 stPanel5.Controls.Add(viewport);
+                //viewport.Dock = DockStyle.Fill;
                 DisplayViewport = true;
             }
             else
